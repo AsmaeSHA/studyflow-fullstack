@@ -1,0 +1,46 @@
+<header class="topbar">
+  <div class="topbar__left">
+    <h1 class="topbar__title">{{ title }}</h1>
+    <span class="topbar__date">{{ today | date:'EEEE d MMMM yyyy' }}</span>
+  </div>
+
+  <div class="topbar__right">
+    <!-- Notifications -->
+    <div class="notif-wrap">
+      <button class="icon-btn" (click)="toggleNotifs()">
+        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+          <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+        </svg>
+        <span class="notif-dot">{{ notifications.length }}</span>
+      </button>
+
+      <!-- Dropdown notifs -->
+      <div class="notif-dropdown" *ngIf="showNotifs" (click)="$event.stopPropagation()">
+        <div class="notif-header">
+          <span>Notifications</span>
+          <span class="notif-count">{{ notifications.length }} nouvelles</span>
+        </div>
+        <div class="notif-list">
+          <div class="notif-item" *ngFor="let n of notifications" [class]="'notif-item--' + n.type">
+            <span class="notif-icon">{{ n.icon }}</span>
+            <div class="notif-body">
+              <p class="notif-text">{{ n.text }}</p>
+              <span class="notif-time">{{ n.time }}</span>
+            </div>
+          </div>
+        </div>
+        <button class="notif-footer">Voir toutes les notifications</button>
+      </div>
+    </div>
+
+    <!-- Avatar -->
+    <div class="user-chip">
+      <div class="user-avatar">{{ initials }}</div>
+      <span class="user-name">{{ user?.name || 'Utilisateur' }}</span>
+    </div>
+  </div>
+</header>
+
+<!-- Overlay pour fermer notifs -->
+<div class="notif-overlay" *ngIf="showNotifs" (click)="showNotifs = false"></div>

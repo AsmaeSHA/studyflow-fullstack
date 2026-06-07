@@ -1,0 +1,392 @@
+<section class="notif-shell">
+
+  <!-- HEADER -->
+  <header class="page-head">
+    <div class="head-left">
+      <p class="eyebrow">Centre de notifications</p>
+      <h1>Boîte de réception</h1>
+      <p class="muted">Toutes tes alertes au même endroit, organisées par jour.</p>
+    </div>
+
+    <div class="head-actions">
+      <button class="btn-mark-all"
+              *ngIf="notifSvc.unreadCount() > 0"
+              (click)="notifSvc.markAllAsRead().subscribe()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="m3 12 4 4 8-8"/><path d="m14 12 2 2 5-5"/>
+        </svg>
+        Tout marquer comme lu
+      </button>
+    </div>
+  </header>
+
+  <!-- MAIN GRID -->
+  <div class="grid-two">
+
+    <!-- LEFT SIDEBAR -->
+    <aside class="side-panel">
+
+
+      <div class="hero-stat">
+        <div class="hs-bg" aria-hidden="true"><div class="hs-orb"></div></div>
+        <div class="hs-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/>
+            <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+          </svg>
+        </div>
+        <div class="hs-content">
+          <span class="hs-num">{{ notifSvc.unreadCount() }}</span>
+          <span class="hs-lbl">non lue{{ notifSvc.unreadCount() > 1 ? 's' : '' }}</span>
+          <p class="hs-total">{{ notifSvc.notifications().length }} au total</p>
+        </div>
+      </div>
+
+
+      <nav class="rail" aria-label="Filtres">
+        <h4 class="rail-title">Catégories</h4>
+
+        <button class="rail-item"
+                [class.on]="activeFilter() === null && !showUnreadOnly()"
+                (click)="activeFilter.set(null); showUnreadOnly.set(false)">
+          <span class="ri-icon all">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+              <path d="M4 6h16M4 12h16M4 18h16"/>
+            </svg>
+          </span>
+          <span class="ri-label">Toutes</span>
+          <span class="ri-count">{{ notifSvc.notifications().length }}</span>
+        </button>
+
+        <button class="rail-item"
+                [class.on]="showUnreadOnly()"
+                (click)="showUnreadOnly.set(true); activeFilter.set(null)">
+          <span class="ri-icon unread">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+              <circle cx="12" cy="12" r="3" fill="currentColor"/>
+            </svg>
+          </span>
+          <span class="ri-label">Non lues</span>
+          <span class="ri-count badge-warn">{{ notifSvc.unreadCount() }}</span>
+        </button>
+
+        <hr class="rail-sep">
+
+        <button *ngFor="let t of typeList"
+                class="rail-item"
+                [class.on]="activeFilter() === t"
+                [style.--ra]="meta(t).accent"
+                [style.--rs]="meta(t).soft"
+                (click)="activeFilter.set(t); showUnreadOnly.set(false)">
+          <span class="ri-icon by-type">
+            <ng-container [ngSwitch]="meta(t).icon">
+              <svg *ngSwitchCase="'clock'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="8"/><path d="M12 8v5l3 2"/>
+              </svg>
+              <svg *ngSwitchCase="'users'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+                <circle cx="9" cy="7" r="4"/>
+                <path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>
+              </svg>
+              <svg *ngSwitchCase="'target'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3"/>
+                <path d="M12 2v3M12 19v3M2 12h3M19 12h3"/>
+              </svg>
+              <svg *ngSwitchCase="'message'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z"/>
+              </svg>
+
+            </ng-container>
+          </span>
+          <span class="ri-label">{{ meta(t).shortLabel }}</span>
+          <span class="ri-count">{{ countByType(t) }}</span>
+        </button>
+
+      </nav>
+
+    </aside>
+
+    <!-- RIGHT STREAM -->
+    <main class="stream">
+
+      <div class="stream-bar">
+        <div class="stream-title">
+          <h2 *ngIf="activeFilter() === null && !showUnreadOnly()">Toutes les notifications</h2>
+          <h2 *ngIf="showUnreadOnly()">Non lues</h2>
+          <h2 *ngIf="activeFilter()">{{ meta(activeFilter()!).label }}</h2>
+          <span class="stream-count">{{ filtered().length }} élément{{ filtered().length !== 1 ? 's' : '' }}</span>
+        </div>
+      </div>
+
+      <!-- Empty -->
+      <div class="empty-state" *ngIf="grouped().length === 0">
+        <div class="empty-art">
+          <svg viewBox="0 0 80 80" fill="none">
+            <rect x="14" y="20" width="52" height="44" rx="10" fill="#fff" stroke="#1a1a1a" stroke-width="2"/>
+            <path d="M22 30l18 12 18-12" stroke="#1a1a1a" stroke-width="2" stroke-linecap="round"/>
+            <circle cx="58" cy="20" r="8" fill="#f5c518" stroke="#1a1a1a" stroke-width="2"/>
+            <line x1="55" y1="20" x2="61" y2="20" stroke="#1a1a1a" stroke-width="2.2" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <h3>Tout est en ordre</h3>
+        <p>Aucune notification pour ce filtre. Reviens plus tard !</p>
+      </div>
+
+      <!-- Groups by date -->
+      <div class="group" *ngFor="let g of grouped()">
+        <div class="group-head">
+          <span class="group-label">{{ g.label }}</span>
+          <span class="group-bar"></span>
+          <span class="group-count">{{ g.items.length }}</span>
+        </div>
+
+        <article *ngFor="let n of g.items; let i = index"
+                 class="card"
+                 [class.unread]="!n.isRead"
+                 [class.clickable-chat]="n.type === 'NEW_MESSAGE' || n.type === 'SESSION_SHARED'"
+                 [style.--na]="meta(n.type).accent"
+                 [style.--ns]="meta(n.type).soft"
+                 [style.--ni]="i"
+                 (click)="read(n)">
+
+          <span class="card-stripe" aria-hidden="true"></span>
+
+          <div class="card-icon">
+            <ng-container [ngSwitch]="meta(n.type).icon">
+              <svg *ngSwitchCase="'clock'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="8"/><path d="M12 8v5l3 2"/>
+              </svg>
+              <svg *ngSwitchCase="'users'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+                <circle cx="9" cy="7" r="4"/>
+                <path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>
+              </svg>
+              <svg *ngSwitchCase="'target'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3"/>
+                <path d="M12 2v3M12 19v3M2 12h3M19 12h3"/>
+              </svg>
+              <svg *ngSwitchCase="'message'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z"/>
+              </svg>
+              <svg *ngSwitchCase="'share'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/>
+                <path d="m8.6 10.5 6.8-4M8.6 13.5l6.8 4"/>
+              </svg>
+            </ng-container>
+            <span class="udot" *ngIf="!n.isRead"></span>
+          </div>
+
+          <div class="card-body">
+            <div class="card-row1">
+              <span class="card-type">{{ meta(n.type).label }}</span>
+              <div class="card-right-meta">
+                <span class="chat-badge" *ngIf="n.type === 'NEW_MESSAGE' || n.type === 'SESSION_SHARED'">
+                  <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M14 9.6c0 1.3-1 2.4-2.3 2.4H6l-3.3 2v-9C2.7 3.7 3.8 2.7 5 2.7h6.7c1.3 0 2.3 1 2.3 2.4z"/>
+                  </svg>
+                  Répondre dans le chat
+                </span>
+                <span class="card-time" [title]="absoluteDate(n.createdAt)">{{ timeAgo(n.createdAt) }}</span>
+              </div>
+            </div>
+            <p class="card-msg">{{ n.message }}</p>
+
+            <div class="card-actions" *ngIf="!isStale(n)" (click)="$event.stopPropagation()">
+              <ng-container [ngSwitch]="n.type">
+
+                <!-- ✅ INVITATION : bouton "Voir les détails" au lieu d'Accepter/Refuser direct -->
+                <ng-container *ngSwitchCase="'GROUP_INVITATION'">
+                  <button class="action preview-btn" (click)="openInvitationPreview($event, n)">
+                    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+                      <circle cx="8" cy="8" r="6"/>
+                      <path d="M8 5v4M8 11v.5"/>
+                    </svg>
+                    Voir les détails
+                  </button>
+                </ng-container>
+
+                <ng-container *ngSwitchCase="'SESSION_REMINDER'">
+                  <button class="action ghost" (click)="goSession(n)">
+                    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+                      <rect x="2" y="3" width="12" height="11" rx="2"/><line x1="2" y1="6" x2="14" y2="6"/>
+                    </svg>
+                    Voir la session
+                  </button>
+                </ng-container>
+
+                <ng-container *ngSwitchCase="'NEW_MESSAGE'">
+                  <button class="action chat-action" (click)="goChat(n)">
+                    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M14 9.6c0 1.3-1 2.4-2.3 2.4H6l-3.3 2v-9C2.7 3.7 3.8 2.7 5 2.7h6.7c1.3 0 2.3 1 2.3 2.4z"/>
+                    </svg>
+                    Ouvrir le chat
+                  </button>
+                </ng-container>
+
+                <ng-container *ngSwitchCase="'SESSION_SHARED'">
+                  <button class="action ghost" (click)="goChat(n)">
+                    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+                      <circle cx="8" cy="8" r="6"/><line x1="8" y1="5" x2="8" y2="11"/><line x1="5" y1="8" x2="11" y2="8"/>
+                    </svg>
+                    Ouvrir la session
+                  </button>
+                </ng-container>
+
+                <ng-container *ngSwitchCase="'GOAL_ACHIEVED'">
+                  <button class="action ghost" (click)="goAnalytics()">
+                    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+                      <polyline points="2 12 6 8 9 11 14 4"/>
+                    </svg>
+                    Voir mes stats
+                  </button>
+                </ng-container>
+
+              </ng-container>
+            </div>
+          </div>
+
+          <button class="card-del" (click)="remove($event, n.id)" title="Supprimer">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M18 6 6 18M6 6l12 12"/>
+            </svg>
+          </button>
+        </article>
+      </div>
+    </main>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════
+     MODAL DÉTAILS INVITATION
+     S'ouvre quand on clique sur "Voir les détails"
+     ══════════════════════════════════════════════════════ -->
+<div class="inv-modal-backdrop" *ngIf="invitationPreview()" (click)="closePreview()">
+  <div class="inv-modal" (click)="$event.stopPropagation()" *ngIf="invitationPreview() as preview">
+
+    <!-- Bande colorée en haut avec couleur du groupe -->
+    <div class="inv-modal-cover"
+         [style.background]="preview.group?.color || '#f5c518'">
+      <div class="inv-modal-cover-mesh"></div>
+      <button class="inv-modal-close" (click)="closePreview()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <path d="M18 6 6 18M6 6l12 12"/>
+        </svg>
+      </button>
+      <!-- Badge matière -->
+      <span class="inv-modal-subject" *ngIf="preview.group?.subject">
+        {{ preview.group!.subject }}
+      </span>
+    </div>
+
+    <div class="inv-modal-body">
+
+      <!-- Nom du groupe + description -->
+      <div class="inv-modal-identity">
+        <h2 class="inv-modal-name">{{ preview.group?.name || preview.invitation?.groupName || 'Groupe inconnu' }}</h2>
+        <p class="inv-modal-desc" *ngIf="preview.group?.description">{{ preview.group!.description }}</p>
+      </div>
+
+      <!-- Matière / Module étudié -->
+<div class="inv-modal-subject-section" *ngIf="preview.group?.subject">
+  <p class="inv-members-label">Matière étudiée</p>
+  <div class="inv-subject-pill">
+    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M2 3h12v8a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V3Z"/>
+      <path d="M2 3h12M6 3V1M10 3V1"/>
+    </svg>
+    {{ preview.group!.subject }}
+  </div>
+</div>
+
+      <!-- Qui a invité + message -->
+      <div class="inv-modal-sender" *ngIf="preview.invitation?.senderName">
+        <div class="sender-av">{{ initials(preview.invitation!.senderName) }}</div>
+        <div class="sender-info">
+          <span class="sender-label">Invitation de</span>
+          <span class="sender-name">{{ preview.invitation!.senderName }}</span>
+        </div>
+        <span class="inv-expires" *ngIf="preview.invitation?.expiresAt">
+          {{ expiresIn(preview.invitation!.expiresAt) }}
+        </span>
+      </div>
+
+      <!-- Message de l'expéditeur -->
+      <div class="inv-modal-msg" *ngIf="preview.invitation?.message">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M14 9.6c0 1.3-1 2.4-2.3 2.4H6l-3.3 2v-9C2.7 3.7 3.8 2.7 5 2.7h6.7c1.3 0 2.3 1 2.3 2.4z"/>
+        </svg>
+        <p>{{ preview.invitation!.message }}</p>
+      </div>
+
+      <!-- Infos clés du groupe -->
+      <div class="inv-modal-stats" *ngIf="preview.group">
+        <div class="inv-stat">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M13 14v-1a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v1"/>
+            <circle cx="8" cy="5" r="3"/>
+          </svg>
+          <span class="inv-stat-val">{{ preview.group.memberCount || 1 }}</span>
+          <span class="inv-stat-lbl">/ {{ preview.group.maxMembers }} membres</span>
+        </div>
+        <div class="inv-stat">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="2" width="12" height="12" rx="3"/>
+            <path d="M5 8h6M5 11h4"/>
+          </svg>
+          <span class="inv-stat-val inv-stat-privacy">
+            {{ preview.group.isPrivate ? 'Privé' : 'Public' }}
+          </span>
+        </div>
+        <!-- Barre de capacité -->
+        <div class="inv-capacity">
+          <div class="inv-capacity-bar">
+            <div class="inv-capacity-fill"
+                 [style.width]="slotPct(preview.group) + '%'"
+                 [style.background]="preview.group.color || '#f5c518'">
+            </div>
+          </div>
+          <span class="inv-capacity-lbl">{{ slotPct(preview.group) }}% occupé</span>
+        </div>
+      </div>
+
+      <!-- Liste des membres visibles -->
+      <div class="inv-modal-members" *ngIf="preview.group && groupMembers(preview.group.id).length > 0">
+        <p class="inv-members-label">Membres actuels</p>
+        <div class="inv-members-list">
+          <div class="inv-member" *ngFor="let m of groupMembers(preview.group.id)">
+            <div class="inv-member-av" [style.background]="preview.group.color || '#f5c518'">
+              {{ initials(m.userName) }}
+            </div>
+            <div class="inv-member-info">
+              <span class="inv-member-name">{{ m.userName }}</span>
+              <span class="inv-member-role"
+                    [class.role-owner]="m.role === 'OWNER'"
+                    [class.role-mod]="m.role === 'MODERATOR'"
+                    [class.role-member]="m.role === 'MEMBER'">
+                {{ m.role === 'OWNER' ? 'Propriétaire' : m.role === 'MODERATOR' ? 'Modérateur' : 'Membre' }}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /inv-modal-body -->
+
+    <!-- Actions finales -->
+    <div class="inv-modal-footer">
+      <button class="inv-btn-decline" (click)="declineFromPreview()">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <line x1="4" y1="4" x2="12" y2="12"/><line x1="12" y1="4" x2="4" y2="12"/>
+        </svg>
+        Refuser
+      </button>
+      <button class="inv-btn-accept" (click)="acceptFromPreview()">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <polyline points="3 8 7 12 13 4"/>
+        </svg>
+        Rejoindre le groupe
+      </button>
+    </div>
+
+  </div>
+</div>

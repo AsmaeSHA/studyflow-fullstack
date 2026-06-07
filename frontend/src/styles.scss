@@ -1,0 +1,394 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  background: #F8FAFC;
+  color: #0F172A;
+  min-height: 100vh;
+}
+
+a { text-decoration: none; }
+button { cursor: pointer; font-family: inherit; }
+
+.app-shell.theme-dark {
+  --user-bg: #11100f;
+  --user-panel: #1b1a18;
+  --user-panel-soft: #24221f;
+  --user-panel-warm: #201d19;
+  --user-text: #f7f0e8;
+  --user-muted: #b5aaa0;
+  --user-muted-soft: #8f867d;
+  --user-border: rgba(255, 255, 255, .1);
+  --user-border-strong: rgba(255, 255, 255, .18);
+  --user-shadow: 0 18px 56px rgba(0, 0, 0, .34);
+  background: var(--user-bg);
+  color: var(--user-text);
+}
+
+.app-shell.theme-dark .main,
+.app-shell.theme-dark .page {
+  background: var(--user-bg);
+}
+
+.app-shell.theme-dark app-dashboard,
+.app-shell.theme-dark app-planning,
+.app-shell.theme-dark app-sessions,
+.app-shell.theme-dark app-calendar,
+.app-shell.theme-dark app-subjects,
+.app-shell.theme-dark app-groups,
+.app-shell.theme-dark app-goals,
+.app-shell.theme-dark app-notifications,
+.app-shell.theme-dark app-analytics,
+.app-shell.theme-dark app-chat,
+.app-shell.theme-dark app-collaborative-session,
+.app-shell.theme-dark app-profile {
+  --white: var(--user-panel);
+  --surface: var(--user-panel);
+  --paper: var(--user-panel-soft);
+  --bg: var(--user-bg);
+  --border: var(--user-border);
+  --border2: var(--user-border-strong);
+  --ink: var(--user-text);
+  --ink-soft: var(--user-muted);
+  --muted: var(--user-muted-soft);
+  --text: var(--user-text);
+  --text-muted: var(--user-muted);
+  --cream: #2a2622;
+  --shadow: var(--user-shadow);
+  --shadow-sm: 0 12px 34px rgba(0, 0, 0, .28);
+  --shadow-md: 0 20px 58px rgba(0, 0, 0, .38);
+  --warm-card: linear-gradient(145deg, #1f1d19 0%, #27231e 100%);
+  --academic-card: linear-gradient(145deg, #1f1d19 0%, #25221d 58%, #20251f 100%);
+  --sand-card: linear-gradient(150deg, #211e1a 0%, #28231d 50%, #1b1917 100%);
+  background: var(--user-bg);
+  color: var(--user-text);
+}
+
+.app-shell.theme-dark app-sidebar .sidebar {
+  background: rgba(27, 26, 24, .94);
+  border-color: var(--user-border);
+  box-shadow: 0 18px 42px rgba(0, 0, 0, .32);
+}
+
+.app-shell.theme-dark app-sidebar .brand-name,
+.app-shell.theme-dark app-sidebar .nav-item:hover {
+  color: var(--user-text);
+}
+
+.app-shell.theme-dark app-sidebar .nav-item {
+  color: var(--user-muted);
+}
+
+.app-shell.theme-dark app-sidebar .nav-item:hover,
+.app-shell.theme-dark app-sidebar .nav-item--ghost {
+  background: var(--user-panel-soft);
+  border-color: var(--user-border);
+}
+
+.app-shell.theme-dark app-sidebar .nav-item.active {
+  background: #f5c518;
+  color: #161412;
+  box-shadow: 0 10px 24px rgba(245, 197, 24, .22);
+}
+
+.app-shell.theme-dark app-topbar .greeting h1,
+.app-shell.theme-dark app-topbar .search input {
+  color: var(--user-text);
+}
+
+.app-shell.theme-dark app-topbar .greeting p,
+.app-shell.theme-dark app-topbar .search,
+.app-shell.theme-dark app-topbar .search input::placeholder {
+  color: var(--user-muted);
+}
+
+.app-shell.theme-dark app-topbar .search,
+.app-shell.theme-dark app-topbar .icon-btn {
+  background: var(--user-panel);
+  border-color: var(--user-border);
+}
+
+.app-shell.theme-dark app-topbar .icon-btn {
+  color: var(--user-text);
+}
+
+.app-shell.theme-dark app-topbar .icon-btn:hover {
+  background: var(--user-panel-soft);
+}
+
+.app-shell.theme-dark :is(
+  .card,
+  .panel,
+  .strip-card,
+  .schedule-panel,
+  .chart-card,
+  .kpi,
+  .cst-card,
+  .inv-card,
+  .rail,
+  .empty-state,
+  .preview-card,
+  .preview-empty,
+  .gen-summary,
+  .goal-line,
+  .stat-tile,
+  .mini-kpi,
+  .period-tabs,
+  .mode-switch,
+  .tab-cluster,
+  .subject-table tbody td,
+  .wv-body,
+  .wv-day-head,
+  .tl-card,
+  .tip-card,
+  .inv-modal,
+  .inv-modal-sender,
+  .inv-modal-stats,
+  .modal,
+  .modal-create,
+  .page-shell
+) {
+  background: var(--user-panel);
+  border-color: var(--user-border);
+  color: var(--user-text);
+  box-shadow: var(--user-shadow);
+}
+
+.app-shell.theme-dark :is(
+  .card:hover,
+  .panel:hover,
+  .strip-card:hover,
+  .chart-card:hover,
+  .kpi:hover,
+  .cst-card:hover,
+  .tl-card:hover
+) {
+  box-shadow: 0 22px 64px rgba(0, 0, 0, .44);
+}
+
+.app-shell.theme-dark :is(
+  h1,
+  h2,
+  h3,
+  h4,
+  .hero-title,
+  .panel-title,
+  .panel-head h3,
+  .card-head h3,
+  .chart-title,
+  .sec-label,
+  .field label,
+  .field span,
+  .cst-name,
+  .inv-msg,
+  .stream-title h2,
+  .group-label,
+  .sched-date-label,
+  .tl-start,
+  .tl-title,
+  .wv-day-head,
+  .pv-title h3,
+  .gs-label,
+  .gs-subj-name,
+  .goal-name,
+  .subj-name,
+  .kpi-val,
+  .kpi-lbl--lg,
+  .ring-val,
+  .hm-hours,
+  .rate-pct,
+  .num-cell,
+  .subject-cell strong,
+  .metric-head h3,
+  .goal-line strong,
+  .cons-tip strong,
+  .sender-name,
+  .inv-modal-name,
+  .inv-stat-val,
+  .inv-member-name
+) {
+  color: var(--user-text);
+}
+
+.app-shell.theme-dark :is(
+  .muted,
+  .hero-sub,
+  .sec-hint,
+  .card-msg,
+  .card-time,
+  .stream-count,
+  .ri-label,
+  .cst-desc,
+  .slot-label,
+  .inv-date,
+  .empty-msg,
+  .empty-state p,
+  .kpi-lbl,
+  .kpi-sub,
+  .goal-status,
+  .subj-planned,
+  .bar-label,
+  .leg,
+  .trend-labels,
+  .tl-duration,
+  .tl-shared,
+  .footer-tip,
+  .pe-copy p,
+  .subject-cell span,
+  .subject-table thead th,
+  .mini-kpi span,
+  .metric-note,
+  .goal-line span,
+  .form-label,
+  .label-text,
+  .checkbox-text,
+  .invite-hint,
+  .inv-modal-desc,
+  .sender-label,
+  .inv-stat-lbl,
+  .inv-capacity-lbl,
+  .inv-members-label
+) {
+  color: var(--user-muted);
+}
+
+.app-shell.theme-dark :is(
+  input,
+  textarea,
+  select,
+  .field input,
+  .form-input,
+  .form-textarea,
+  .security-row input,
+  .goal-stepper input
+) {
+  background: var(--user-panel-soft);
+  border-color: var(--user-border);
+  color: var(--user-text);
+}
+
+.app-shell.theme-dark :is(input, textarea, select)::placeholder {
+  color: var(--user-muted-soft);
+}
+
+.app-shell.theme-dark :is(
+  input:focus,
+  textarea:focus,
+  select:focus,
+  .field input:focus,
+  .form-input:focus,
+  .form-textarea:focus,
+  .security-row input:focus
+) {
+  background: #2b2925;
+  border-color: #f5c518;
+  box-shadow: 0 0 0 4px rgba(245, 197, 24, .13);
+}
+
+.app-shell.theme-dark :is(
+  .subj-row,
+  .slot-row,
+  .goal-line,
+  .tl-card,
+  .wv-day-head,
+  .hm-cell,
+  .gs-day-tile,
+  .inv-member:hover,
+  .rail-item:hover,
+  .action.ghost,
+  .btn-secondary,
+  .ptitle-icon,
+  .icon-btn
+) {
+  background: var(--user-panel-soft);
+  border-color: var(--user-border);
+}
+
+.app-shell.theme-dark :is(
+  .card.unread,
+  .cons-tip,
+  .tip-card,
+  .preview-empty,
+  .inv-modal-msg,
+  .inv-subject-pill,
+  .cst-subject,
+  .inv-chip
+) {
+  background: linear-gradient(135deg, rgba(245, 197, 24, .12), rgba(255, 142, 126, .07));
+  border-color: rgba(245, 197, 24, .28);
+}
+
+.app-shell.theme-dark :is(
+  .rate-track,
+  .subj-track,
+  .progress-track,
+  .goal-mini-track,
+  .slot-bar,
+  .gs-bar-track,
+  .inv-capacity-bar,
+  .wv-hour-line,
+  .wv-hour,
+  .wv-col
+) {
+  background: rgba(255, 255, 255, .08);
+  border-color: rgba(255, 255, 255, .06);
+}
+
+.app-shell.theme-dark .subject-table tbody td {
+  background: var(--user-panel-soft);
+  border-color: var(--user-border);
+}
+
+.app-shell.theme-dark .subject-table tbody tr:hover td {
+  background: #2b2925;
+}
+
+.app-shell.theme-dark :is(.modal-header, .modal-footer, .panel-head, .security-row, .pv-footer, .rail-sep, .inv-modal-footer) {
+  border-color: var(--user-border);
+}
+
+.app-shell.theme-dark :is(.dot-grid, .stars-layer) {
+  opacity: .22;
+}
+
+.app-shell.theme-dark .star {
+  background: rgba(245, 197, 24, .5);
+}
+
+.app-shell.theme-dark :is(.blob--1, .glow-orb--1, .hs-orb) {
+  opacity: .85;
+}
+
+.app-shell.theme-dark .theme-toggle {
+  background: #2a2824;
+}
+
+.app-shell.theme-dark .t-btn {
+  color: var(--user-muted);
+}
+
+.app-shell.theme-dark .t-btn.on {
+  background: #f5c518;
+  color: #161412;
+}
+
+.app-shell.theme-dark :is(.btn-outline, .action.decline, .inv-btn-decline) {
+  color: var(--user-text);
+  border-color: var(--user-border-strong);
+}
+
+.app-shell.theme-dark :is(.btn-outline:hover, .action.ghost:hover) {
+  background: #f5c518;
+  border-color: #f5c518;
+  color: #161412;
+}
+
+.app-shell.theme-dark :is(.av, .tl-dot) {
+  border-color: var(--user-panel);
+}

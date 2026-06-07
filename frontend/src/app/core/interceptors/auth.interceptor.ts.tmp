@@ -1,0 +1,31 @@
+import { HttpInterceptorFn, HttpErrorResponse } from '@angular/common/http';
+import { inject } from '@angular/core';
+import { Router } from '@angular/router';
+import { catchError, throwError } from 'rxjs';
+
+/**
+ * Ajoute le Bearer token aux requetes sortantes (sauf /auth/*)
+ * et redirige vers /auth/login en cas de 401.
+ */
+export const authInterceptor: HttpInterceptorFn = (req, next) => {
+  const router = inject(Router);
+  const token = localStorage.getItem('accessToken');
+
+  const isAuthEndpoint =
+    req.url.includes('/auth/login') ||
+    req.url.includes('/auth/register') ||
+    req.url.includes('/auth/refresh');
+
+  // Endpoints qui peuvent renvoyer 401 pour une raison metier
+  // (ex : mauvais mot de passe actuel) sans que le JWT soit invalide.
+  // Sur ces endpoints on ne deconnecte PAS l'utilisateur.
+  const isBusinessAuthEndpoint =
+    req.url.includes('/users/me/password');
+
+  const authReq = token && !isAuthEndpoint
+    ? req.clone({ setHeaders: { Authorization: `Bearer ${token}` } })
+    : req;
+
+  return next(authReq).pipe(
+    catchError((err: HttpErrorResponse) => {
+      if (err.status === 4

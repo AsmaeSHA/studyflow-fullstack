@@ -1,0 +1,41 @@
+// ─── STUDYFLOW DARK THEME ───────────────────────────────────────────
+$bg-base:        #0D0F14;
+$bg-surface:     #151820;
+$bg-card:        #1C2030;
+$bg-elevated:    #242840;
+$border:         #2A2F45;
+$border-subtle:  #1F2438;
+
+$text-primary:   #E8EAF0;
+$text-secondary: #8B91A8;
+$text-muted:     #4A5070;
+
+$accent:         #6C8EEF;
+$accent-hover:   #7FA0F8;
+$accent-glow:    rgba(108, 142, 239, 0.15);
+
+$success:        #4CAF82;
+$warning:        #F0A030;
+$danger:         #E05555;
+$info:           #4BA8D5;
+
+$purple:         #9B72EF;
+$teal:           #3DC9B0;
+$rose:           #E06080;
+
+// ─── SPACING ────────────────────────────────────────────────────────
+$sidebar-w: 240px;
+$topbar-h:  60px;
+$radius:    10px;
+$radius-sm: 6px;
+$radius-lg: 16px;
+
+// ─── SHADOWS ────────────────────────────────────────────────────────
+$shadow-sm:  0 2px 8px rgba(0,0,0,0.3);
+$shadow-md:  0 4px 20px rgba(0,0,0,0.4);
+$shadow-lg:  0 8px 40px rgba(0,0,0,0.5);
+$shadow-accent: 0 0 20px rgba(108, 142, 239, 0.2);
+
+// ─── TRANSITIONS ────────────────────────────────────────────────────
+$transition: all 0.2s ease;
+$transition-slow: all 0.35s cubic-bezier(0.4,0,0.2,1);

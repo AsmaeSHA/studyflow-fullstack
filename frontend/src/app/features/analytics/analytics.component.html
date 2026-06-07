@@ -1,0 +1,144 @@
+<div class="page-shell">
+  <app-sidebar></app-sidebar>
+
+  <div class="page-main">
+    <div class="page-content">
+
+      <!-- Period Selector -->
+      <div class="period-row">
+        <div class="period-tabs">
+          <button class="period-tab" [class.active]="activePeriod === 'week'"  (click)="setPeriod('week')">Cette semaine</button>
+          <button class="period-tab" [class.active]="activePeriod === 'month'" (click)="setPeriod('month')">Ce mois</button>
+          <button class="period-tab" [class.active]="activePeriod === 'all'"   (click)="setPeriod('all')">Tout</button>
+        </div>
+      </div>
+
+      <!-- KPIs -->
+      <div class="kpi-grid">
+        <div class="kpi-card" *ngFor="let k of kpis; let i = index"
+             [style.animation-delay]="(i * 0.08) + 's'">
+          <div class="kpi-top">
+            <span class="kpi-icon" [style.color]="k.color">{{ k.icon }}</span>
+            <span class="kpi-delta up">↑ {{ k.delta }}</span>
+          </div>
+          <div class="kpi-value" [style.color]="k.color">{{ k.value }}</div>
+          <div class="kpi-label">{{ k.label }}</div>
+          <div class="kpi-glow" [style.background]="k.color"></div>
+        </div>
+      </div>
+
+      <!-- Charts Row 1 -->
+      <div class="charts-row">
+
+        <!-- Prévu vs Réalisé -->
+        <div class="chart-card chart-card--wide">
+          <div class="chart-header">
+            <h3>Sessions prévues vs réalisées</h3>
+            <div class="legend-row">
+              <span class="legend-item"><span class="leg-dot" style="background:#4facfe"></span>Prévu</span>
+              <span class="legend-item"><span class="leg-dot" style="background:#a78bfa"></span>Réalisé</span>
+            </div>
+          </div>
+          <div class="grouped-bars">
+            <div class="grouped-bar-group" *ngFor="let d of weekData">
+              <div class="grouped-bars-inner">
+                <div class="g-bar planned" [style.height.%]="barH(d.planned, maxBar)" title="Prévu: {{ d.planned }}h"></div>
+                <div class="g-bar done"    [style.height.%]="barH(d.done,    maxBar)" title="Réalisé: {{ d.done }}h"></div>
+              </div>
+              <span class="g-label">{{ d.day }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tendance mensuelle -->
+        <div class="chart-card">
+          <div class="chart-header">
+            <h3>Tendance mensuelle</h3>
+          </div>
+          <div class="line-chart">
+            <div class="line-bar-group" *ngFor="let d of monthlyTrend">
+              <span class="line-val">{{ d.hours }}h</span>
+              <div class="line-bar-bg">
+                <div class="line-bar-fill" [style.height.%]="barH(d.hours, maxMonth)"
+                     style="background: linear-gradient(180deg, #2dd4bf, #4facfe)"></div>
+              </div>
+              <span class="line-label">{{ d.month }}</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Progression par matière -->
+      <div class="chart-card chart-card--full">
+        <div class="chart-header">
+          <h3>Progression par matière — Prévu vs Réalisé</h3>
+        </div>
+        <div class="subject-comparison">
+          <div class="subj-row" *ngFor="let s of subjects; let i = index"
+               [style.animation-delay]="(i * 0.08) + 's'">
+            <span class="subj-name">{{ s.name }}</span>
+            <div class="subj-bars">
+              <div class="subj-bar-wrap">
+                <div class="subj-bar planned-bar"
+                     [style.width.%]="(s.planned / 60) * 100"
+                     style="background: rgba(255,255,255,0.06)">
+                </div>
+              </div>
+              <div class="subj-bar-wrap overlay">
+                <div class="subj-bar done-bar"
+                     [style.width.%]="(s.done / 60) * 100"
+                     [style.background]="s.color">
+                </div>
+              </div>
+            </div>
+            <div class="subj-stats">
+              <span [style.color]="s.color">{{ s.done }}h</span>
+              <span class="subj-sep">/</span>
+              <span>{{ s.planned }}h</span>
+              <span class="subj-pct" [style.color]="s.color">{{ progress(s) }}%</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Productivité hebdo + Objectifs -->
+      <div class="bottom-row">
+
+        <!-- Productivité -->
+        <div class="chart-card">
+          <div class="chart-header"><h3>Productivité par jour</h3></div>
+          <div class="heatmap">
+            <div class="heatmap-day" *ngFor="let d of weekData"
+                 [style.background]="d.done > 0 ? 'rgba(79,172,254,' + (d.done / 4 * 0.6 + 0.1) + ')' : 'rgba(255,255,255,0.03)'"
+                 [title]="d.day + ': ' + d.done + 'h'">
+              <span class="heatmap-label">{{ d.day }}</span>
+              <span class="heatmap-val">{{ d.done > 0 ? d.done + 'h' : '—' }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Objectifs atteints -->
+        <div class="chart-card">
+          <div class="chart-header"><h3>Objectifs hebdomadaires</h3></div>
+          <div class="goals-list">
+            <div class="goal-item" *ngFor="let s of subjects">
+              <div class="goal-info">
+                <span class="goal-name">{{ s.name }}</span>
+                <span class="goal-pct" [style.color]="s.color">{{ progress(s) }}%</span>
+              </div>
+              <div class="goal-bar-bg">
+                <div class="goal-bar-fill" [style.width.%]="progress(s)" [style.background]="s.color"></div>
+              </div>
+              <span class="goal-label">
+                {{ progress(s) >= 100 ? '🏆 Atteint !' : progress(s) >= 70 ? '🔥 En bonne voie' : '📈 À compléter' }}
+              </span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+</div>

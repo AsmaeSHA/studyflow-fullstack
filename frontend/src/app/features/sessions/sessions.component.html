@@ -1,0 +1,154 @@
+<div class="page-shell">
+  <app-sidebar></app-sidebar>
+
+  <div class="page-main">
+    <div class="page-content">
+
+      <!-- Header Row -->
+      <div class="page-header">
+        <div class="filter-tabs">
+          <button class="filter-tab" [class.active]="activeFilter === 'all'"       (click)="setFilter('all')">
+            Toutes <span class="tab-count">{{ sessions.length }}</span>
+          </button>
+          <button class="filter-tab" [class.active]="activeFilter === 'upcoming'"  (click)="setFilter('upcoming')">
+            À venir <span class="tab-count">{{ countBy('upcoming') }}</span>
+          </button>
+          <button class="filter-tab ongoing" [class.active]="activeFilter === 'ongoing'" (click)="setFilter('ongoing')">
+            En cours <span class="tab-count pulse">{{ countBy('ongoing') }}</span>
+          </button>
+          <button class="filter-tab" [class.active]="activeFilter === 'completed'" (click)="setFilter('completed')">
+            Terminées <span class="tab-count">{{ countBy('completed') }}</span>
+          </button>
+          <button class="filter-tab missed" [class.active]="activeFilter === 'missed'" (click)="setFilter('missed')">
+            Manquées <span class="tab-count">{{ countBy('missed') }}</span>
+          </button>
+        </div>
+
+        <div class="header-actions">
+          <div class="search-wrap">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input type="text" placeholder="Rechercher..." [(ngModel)]="searchQuery" class="search-input"/>
+          </div>
+          <button class="create-btn" (click)="showCreateModal = true">
+            <span>+</span> Nouvelle session
+          </button>
+        </div>
+      </div>
+
+      <!-- Sessions List -->
+      <div class="sessions-grid" *ngIf="filtered.length > 0">
+        <div class="session-card" *ngFor="let s of filtered; let i = index"
+             [class]="'session-card--' + s.status"
+             [style.animation-delay]="(i * 0.06) + 's'">
+
+          <!-- Status indicator -->
+          <div class="card-status-bar" [style.background]="s.color"></div>
+
+          <div class="card-body">
+            <div class="card-top">
+              <div class="card-subject-row">
+                <span class="card-subject" [style.color]="s.color">{{ s.subject }}</span>
+                <span class="card-status-badge" [class]="'status-' + s.status">
+                  <span class="status-dot" *ngIf="s.status === 'ongoing'"></span>
+                  {{ statusLabel(s.status) }}
+                </span>
+              </div>
+              <div class="card-priority" [class]="'priority-' + s.priority">
+                {{ s.priority === 'high' ? '🔴 Haute' : s.priority === 'med' ? '🟡 Moyenne' : '🟢 Basse' }}
+              </div>
+            </div>
+
+            <h3 class="card-topic">{{ s.topic }}</h3>
+
+            <div class="card-meta">
+              <span>📅 {{ s.date }}</span>
+              <span>🕐 {{ s.time }}</span>
+              <span>⏱ {{ s.duration }}</span>
+              <span *ngIf="s.group" class="card-group">👥 {{ s.group }}</span>
+            </div>
+          </div>
+
+          <div class="card-actions">
+            <button class="card-action-btn" *ngIf="s.status === 'upcoming' || s.status === 'ongoing'"
+                    (click)="markDone(s.id)" title="Marquer terminée"
+                    [style.color]="'#2dd4bf'" [style.borderColor]="'rgba(45,212,191,0.3)'">
+              ✓ Terminée
+            </button>
+            <button class="card-action-btn card-action-btn--delete"
+                    (click)="deleteSession(s.id)" title="Supprimer">
+              🗑
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Empty State -->
+      <div class="empty-state" *ngIf="filtered.length === 0">
+        <div class="empty-icon">📭</div>
+        <h3>Aucune session trouvée</h3>
+        <p>Crée ta première session pour commencer à planifier.</p>
+        <button class="create-btn" (click)="showCreateModal = true">+ Créer une session</button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ── Create Modal ──────────────────────────────────── -->
+<div class="modal-overlay" *ngIf="showCreateModal" (click)="showCreateModal = false">
+  <div class="modal-card" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>Nouvelle session</h2>
+      <button class="modal-close" (click)="showCreateModal = false">✕</button>
+    </div>
+
+    <div class="modal-form">
+      <div class="form-row">
+        <label>Matière *</label>
+        <select [(ngModel)]="newSession.subject" class="form-select">
+          <option value="" disabled>Choisir une matière</option>
+          <option *ngFor="let s of subjects" [value]="s">{{ s }}</option>
+        </select>
+      </div>
+
+      <div class="form-row">
+        <label>Sujet / Chapitre</label>
+        <input type="text" [(ngModel)]="newSession.topic" class="form-input" placeholder="Ex: Intégrales Chap. 4"/>
+      </div>
+
+      <div class="form-row-2">
+        <div class="form-row">
+          <label>Date *</label>
+          <input type="date" [(ngModel)]="newSession.date" class="form-input"/>
+        </div>
+        <div class="form-row">
+          <label>Heure</label>
+          <input type="time" [(ngModel)]="newSession.time" class="form-input"/>
+        </div>
+      </div>
+
+      <div class="form-row-2">
+        <div class="form-row">
+          <label>Durée</label>
+          <select [(ngModel)]="newSession.duration" class="form-select">
+            <option>30min</option><option>45min</option><option>1h</option>
+            <option>1h30</option><option>2h</option><option>3h</option>
+          </select>
+        </div>
+        <div class="form-row">
+          <label>Priorité</label>
+          <select [(ngModel)]="newSession.priority" class="form-select">
+            <option value="high">🔴 Haute</option>
+            <option value="med">🟡 Moyenne</option>
+            <option value="low">🟢 Basse</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button class="modal-btn modal-btn--ghost" (click)="showCreateModal = false">Annuler</button>
+        <button class="modal-btn modal-btn--primary" (click)="createSession()">Créer la session</button>
+      </div>
+    </div>
+  </div>
+</div>

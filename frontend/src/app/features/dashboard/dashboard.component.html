@@ -1,0 +1,208 @@
+<section class="dash fade-in">
+
+  <div class="row top">
+    <app-chart-card
+      title="Study Time Summary"
+      subtitle="Total studied time, completed time, and planned time"
+      [timeValue]="formatHours(summary().totalStudiedHours)"
+      [burned]="completedStudyMinutes()"
+      [intake]="displayPlannedStudyMinutes()">
+    </app-chart-card>
+
+    <article class="weekly-productivity-card">
+      <div class="weekly-head">
+        <div>
+          <h3>Weekly Productivity</h3>
+          <p>{{ weekRange().displayStart }} - {{ weekRange().displayEnd }}</p>
+        </div>
+        <div class="weekly-rate">
+          {{ weeklyCompletionRate() }}%
+          <span>complete</span>
+        </div>
+      </div>
+
+      <div class="weekly-total">
+        <strong>{{ formatHours(completedStudyHours()) }}</strong>
+        <span>completed of {{ formatHours(displayPlannedStudyHours()) }} planned</span>
+      </div>
+
+      <div class="weekly-bars" aria-label="Weekly planned and completed hours">
+        <div class="weekly-day" *ngFor="let day of weeklyProductivity()">
+          <div class="weekly-columns">
+            <span
+              class="weekly-bar weekly-bar--planned"
+              [style.height.%]="dailyBarHeight(day.plannedHours)"
+              [title]="day.day + ' planned: ' + day.plannedHours + 'h'">
+            </span>
+            <span
+              class="weekly-bar weekly-bar--completed"
+              [style.height.%]="dailyBarHeight(day.completedHours)"
+              [title]="day.day + ' completed: ' + day.completedHours + 'h'">
+            </span>
+          </div>
+          <span class="weekly-day-label">{{ day.day }}</span>
+          <span class="weekly-day-hours">{{ formatHours(day.completedHours) }}</span>
+        </div>
+      </div>
+
+      <div class="weekly-legend">
+        <span><i class="dot dot--planned"></i>Planned</span>
+        <span><i class="dot dot--completed"></i>Completed</span>
+      </div>
+    </article>
+  </div>
+
+  <div class="row middle">
+    <article class="card progress-card subject-progress-card">
+      <div class="card-head">
+        <div>
+          <h3>Subject Progress</h3>
+          <p class="muted">Weekly goal progress by subject</p>
+        </div>
+        <div class="mini-kpi">
+          <strong>{{ topSubjectProgress }}%</strong>
+          <span>top priority</span>
+        </div>
+      </div>
+
+      <div class="subject-table-wrap">
+        <table class="subject-table">
+          <thead>
+            <tr>
+              <th>Subject</th>
+              <th>Priority</th>
+              <th>Weekly goal</th>
+              <th>Achieved</th>
+              <th class="th-rate">Completion rate</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr
+              *ngFor="let row of subjectRows(); let i = index"
+              [style.--subj]="row.subject.color"
+              [style.--progress]="row.progress"
+              [style.animation-delay]="(i * 80) + 'ms'">
+              <td>
+                <div class="subject-cell">
+                  <span class="subject-dot"></span>
+                  <div>
+                    <strong>{{ row.subject.name }}</strong>
+                    <span>{{ row.subject.description }}</span>
+                  </div>
+                </div>
+              </td>
+              <td>
+                <span class="priority-chip" [class]="'priority-chip priority-' + row.subject.priority">
+                  {{ priorityLabel(row.subject.priority) }}
+                </span>
+              </td>
+              <td class="num-cell">{{ formatHours(row.subject.weeklyGoalHours) }}</td>
+              <td class="num-cell">
+                <strong class="achieved-pill">{{ formatHours(row.achievedHours) }}</strong>
+              </td>
+              <td>
+                <div class="rate-cell">
+                  <div class="rate-track">
+                    <span class="rate-fill"></span>
+                  </div>
+                  <strong class="rate-pct">{{ row.progress }}%</strong>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </article>
+  </div>
+
+  <div class="row bottom bottom-orbits">
+
+    <article class="card orbit-card goal-orbit-card">
+      <span class="micro-orb micro-orb--coral"></span>
+      <span class="micro-orb micro-orb--dark"></span>
+
+      <div class="metric-head">
+        <div>
+          <span class="metric-kicker">Plan</span>
+          <h3>Weekly Plan</h3>
+          <p class="muted">Completed time vs the weekly target</p>
+        </div>
+        <div class="metric-badge">
+          <strong>{{ weeklyGoalProgress() }}%</strong>
+          <span>achieved</span>
+        </div>
+      </div>
+
+      <div class="goal-body">
+        <div class="blob-stage blob-stage--lg">
+          <div class="orbit-blob orbit-blob--yellow orbit-blob--lg">
+            <span class="blob-shine"></span>
+            <strong>{{ formatHours(weeklyGoalAchievedHours()) }}</strong>
+            <span class="blob-sub">of {{ formatHours(weeklyGoalTargetHours()) }}</span>
+          </div>
+        </div>
+
+        <div class="goal-copy">
+          <div class="goal-line">
+            <span>Target</span>
+            <strong>{{ formatHours(weeklyGoalTargetHours()) }}</strong>
+          </div>
+          <div class="goal-line">
+            <span>Remaining</span>
+            <strong>{{ formatHours(remainingWeeklyHours()) }}</strong>
+          </div>
+          <div class="goal-mini-track">
+            <span [style.width.%]="weeklyGoalProgress()"></span>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <article class="card orbit-card stat-orbit-card stat-orbit-card--streak">
+      <span class="micro-orb micro-orb--yellow"></span>
+      <span class="micro-orb micro-orb--dark micro-orb--sm"></span>
+
+      <div class="metric-head metric-head--compact">
+        <div>
+          <span class="metric-kicker">Momentum</span>
+          <h3>Current Streak</h3>
+        </div>
+        <span class="delta-chip">{{ streakProgress() }}%</span>
+      </div>
+
+      <div class="blob-stage">
+        <div class="orbit-blob orbit-blob--coral">
+          <span class="blob-shine"></span>
+          <strong>{{ streakDays() }}</strong>
+          <span class="blob-sub">days</span>
+        </div>
+      </div>
+
+      <p class="metric-note">Active study rhythm this week</p>
+    </article>
+
+    <article class="card orbit-card stat-orbit-card stat-orbit-card--session">
+      <span class="micro-orb micro-orb--yellow"></span>
+      <span class="micro-orb micro-orb--coral micro-orb--sm"></span>
+
+      <div class="metric-head metric-head--compact">
+        <div>
+          <span class="metric-kicker">Focus</span>
+          <h3>Longest Session</h3>
+        </div>
+        <span class="delta-chip">{{ longestSessionProgress() }}%</span>
+      </div>
+
+      <div class="blob-stage">
+        <div class="orbit-blob orbit-blob--dark">
+          <span class="blob-shine"></span>
+          <strong>{{ longestSessionMinutes() }}</strong>
+          <span class="blob-sub">min</span>
+        </div>
+      </div>
+
+      <p class="metric-note">Best completed focus block</p>
+    </article>
+  </div>
+
+</section>

@@ -1,0 +1,246 @@
+<div class="chrono-root">
+
+  <div class="dot-grid" aria-hidden="true">
+    <div class="glow-orb glow-orb--1"></div>
+    <div class="glow-orb glow-orb--2"></div>
+  </div>
+
+  <!-- ── HEAD ── -->
+  <header class="page-head">
+    <div class="head-left">
+      <p class="eyebrow">Mon agenda</p>
+      <h1>Calendrier</h1>
+      <p class="muted">
+        <span *ngIf="fromPlanning">✨ Planning fraîchement généré · </span>
+        {{ totalSessions() }} session{{ totalSessions() !== 1 ? 's' : '' }} cette semaine
+      </p>
+    </div>
+
+    <div class="head-actions">
+      <div class="mode-switch" role="tablist" aria-label="Mode d affichage">
+        <button class="mode" [class.on]="mode() === 'day'"  (click)="mode.set('day')"  role="tab">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="4" y="6" width="16" height="14" rx="2"/><line x1="4" y1="10" x2="20" y2="10"/></svg>
+          Jour
+        </button>
+        <button class="mode" [class.on]="mode() === 'week'" (click)="mode.set('week')" role="tab">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="4" y="6" width="16" height="14" rx="2"/><line x1="4" y1="10" x2="20" y2="10"/><line x1="9" y1="10" x2="9" y2="20"/><line x1="15" y1="10" x2="15" y2="20"/></svg>
+          Semaine
+        </button>
+      </div>
+      <button class="btn-today" (click)="goToday()">Aujourd hui</button>
+    </div>
+  </header>
+
+  <!-- ── MAIN LAYOUT ── -->
+  <div class="chrono-layout">
+
+    <!-- ════ LEFT: MINI CALENDAR ════ -->
+    <div class="cal-panel">
+      <div class="month-nav">
+        <button class="nav-arrow" (click)="prevMonth()">
+          <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+        </button>
+        <div class="month-display">
+          <span class="month-name">{{ monthLabel }}</span>
+          <span class="year-label">{{ viewYear() }}</span>
+        </div>
+        <button class="nav-arrow" (click)="nextMonth()">
+          <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"/></svg>
+        </button>
+      </div>
+
+      <div class="dow-row">
+        <span *ngFor="let d of weekDayShort">{{ d }}</span>
+      </div>
+
+      <div class="cal-grid" [class.slide-left]="slideDir === 'left'" [class.slide-right]="slideDir === 'right'">
+        <button *ngFor="let day of calDays()"
+                class="cal-day"
+                [class.today]="day.isToday"
+                [class.other]="day.isOtherMonth"
+                [class.selected]="selectedIso() === day.iso"
+                [class.has-1]="day.sessions.length === 1"
+                [class.has-2]="day.sessions.length === 2"
+                [class.has-many]="day.sessions.length >= 3"
+                [attr.data-count]="day.sessions.length || null"
+                (click)="selectDay(day)">
+          <span class="day-num">{{ day.date }}</span>
+          <span class="day-ring" *ngIf="day.isToday"></span>
+          <div class="dot-row" *ngIf="day.sessions.length > 0">
+            <span *ngFor="let s of day.sessions.slice(0,3)" class="sess-dot" [style.background]="s.subjectColor || '#f5c518'"></span>
+          </div>
+        </button>
+      </div>
+
+      <!-- Subject Legend -->
+      <div class="cal-legend">
+        <h4>Tes matières</h4>
+        <div class="lg-list" *ngIf="subjectLegend().length > 0; else legendEmpty">
+          <div class="lg-item-row" *ngFor="let s of subjectLegend()">
+            <span class="lg-swatch" [style.background]="s.color"></span>
+            <span class="lg-name">{{ s.name }}</span>
+            <span class="lg-count">{{ s.count }}</span>
+          </div>
+        </div>
+        <ng-template #legendEmpty>
+          <p class="lg-empty">Aucune matière dans le planning.</p>
+        </ng-template>
+      </div>
+    </div>
+
+    <!-- ════ RIGHT: SCHEDULE ════ -->
+    <div class="schedule-panel" [class.is-week]="mode() === 'week'">
+
+      <div class="sched-head">
+        <div class="sched-info">
+          <div class="sched-date-label">
+            <span *ngIf="mode() === 'day'">{{ selectedDayLabel }}</span>
+            <span *ngIf="mode() === 'week'">{{ weekLabel() }}</span>
+          </div>
+          <div class="sched-count">
+            <span *ngIf="mode() === 'day'">{{ selectedSessions().length }} session{{ selectedSessions().length !== 1 ? 's' : '' }}</span>
+            <span *ngIf="mode() === 'week'">{{ weekSessions().length }} session{{ weekSessions().length !== 1 ? 's' : '' }} · {{ weekHours() }}h prévues</span>
+          </div>
+        </div>
+
+        <div class="sched-nav" *ngIf="mode() === 'week'">
+          <button class="nav-arrow light" (click)="prevWeek()" title="Semaine précédente">
+            <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+          </button>
+          <button class="nav-arrow light" (click)="nextWeek()" title="Semaine suivante">
+            <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"/></svg>
+          </button>
+        </div>
+
+        <button class="btn-new" (click)="addNew()">
+          <svg viewBox="0 0 20 20" fill="currentColor"><path d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z"/></svg>
+          Ajouter
+        </button>
+      </div>
+
+      <!-- ════ DAY VIEW ════ -->
+      <div *ngIf="mode() === 'day'">
+        <div class="now-track" *ngIf="isSelectedToday()">
+          <div class="now-line" [style.top]="nowLineTop + 'px'">
+            <span class="now-label">MAINTENANT</span>
+          </div>
+        </div>
+
+        <div class="timeline" *ngIf="selectedSessions().length > 0">
+          <div *ngFor="let s of selectedSessions(); let i = index"
+               class="tl-slot"
+               [class.completed]="s.status === 'COMPLETED'"
+               [class.in-progress]="s.status === 'IN_PROGRESS'"
+               [class.cancelled]="s.status === 'CANCELLED'"
+               [style.--si]="i"
+               [style.--sc]="s.subjectColor || '#f5c518'">
+
+            <div class="tl-time">
+              <span class="tl-start">{{ formatTime(s.startDateTime) }}</span>
+              <span class="tl-end muted-t">{{ formatTime(s.endDateTime) }}</span>
+            </div>
+
+            <div class="tl-node">
+              <div class="tl-dot"></div>
+              <div class="tl-track-line"></div>
+            </div>
+
+            <div class="tl-card">
+              <div class="tl-accent"></div>
+              <div class="tl-card-inner">
+                <div class="tl-top-row">
+                  <span class="tl-subject-chip">{{ s.subjectName || 'Matière' }}</span>
+                  <span class="tl-status-badge" [class]="'badge-' + s.status">{{ statusLabel(s.status) }}</span>
+                </div>
+                <div class="tl-title">{{ s.title }}</div>
+                <div class="tl-meta-row">
+                  <span class="tl-duration">
+                    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="6"/><polyline points="8 5 8 8 10 10"/></svg>
+                    {{ s.plannedDuration }} min
+                  </span>
+                  <span class="tl-shared" *ngIf="s.isShared">
+                    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11.5" cy="3" r="1.5"/><circle cx="6" cy="8" r="1.5"/><circle cx="11.5" cy="13" r="1.5"/><line x1="4.5" y1="7" x2="9.5" y2="4.5"/><line x1="4.5" y1="9" x2="9.5" y2="11.5"/></svg>
+                    Partagée
+                  </span>
+                </div>
+                <div class="progress-track" *ngIf="s.status === 'IN_PROGRESS'">
+                  <div class="progress-fill" [style.width]="progressPct(s) + '%'"></div>
+                  <span class="progress-label">{{ progressPct(s) }}%</span>
+                </div>
+              </div>
+              <div class="done-overlay" *ngIf="s.status === 'COMPLETED'">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="empty-day" *ngIf="selectedSessions().length === 0">
+          <div class="empty-clock">
+            <svg viewBox="0 0 80 80" fill="none">
+              <circle cx="40" cy="40" r="36" stroke="rgba(245,197,24,.2)" stroke-width="2"/>
+              <circle cx="40" cy="40" r="28" stroke="rgba(245,197,24,.12)" stroke-width="1"/>
+              <line x1="40" y1="40" x2="40" y2="18" stroke="#f5c518" stroke-width="2" stroke-linecap="round" class="clock-min"/>
+              <line x1="40" y1="40" x2="55" y2="40" stroke="#ff8e7e" stroke-width="2.5" stroke-linecap="round" class="clock-hr"/>
+              <circle cx="40" cy="40" r="3" fill="#f5c518"/>
+            </svg>
+          </div>
+          <p class="empty-msg">Aucune session ce jour-là.</p>
+          <button class="btn-new" (click)="addNew()">Planifier une session</button>
+        </div>
+      </div>
+
+      <!-- ════ WEEK VIEW ════ -->
+      <div class="week-view" *ngIf="mode() === 'week'">
+        <div class="wv-headers">
+          <div class="wv-time-spacer"></div>
+          <button class="wv-day-head"
+                  *ngFor="let d of weekDays()"
+                  [class.today]="d.iso === todayIso"
+                  [class.selected]="selectedIso() === d.iso"
+                  (click)="selectDayIso(d.iso); mode.set('day')"
+                  [title]="'Voir le ' + d.full + ' en détail'">
+            <span class="wv-day-name">{{ d.label }}</span>
+            <span class="wv-day-num">{{ d.dayNum }}</span>
+            <span class="wv-day-count" *ngIf="d.sessions.length > 0">{{ d.sessions.length }}</span>
+          </button>
+        </div>
+
+        <div class="wv-body">
+          <div class="wv-times">
+            <div class="wv-hour" *ngFor="let h of hourRange()"><span>{{ h }}:00</span></div>
+          </div>
+
+          <div class="wv-cols">
+            <div class="wv-col" *ngFor="let d of weekDays()">
+              <div class="wv-hour-line" *ngFor="let h of hourRange()"></div>
+
+              <div class="wv-now" *ngIf="d.iso === todayIso" [style.top]="weekNowTop() + 'px'">
+                <span class="wv-now-dot"></span>
+              </div>
+
+              <div class="wv-block"
+                   *ngFor="let s of d.sessions"
+                   [style.top]="blockTop(s) + 'px'"
+                   [style.height]="blockHeight(s) + 'px'"
+                   [style.background]="(s.subjectColor || '#f5c518') + '20'"
+                   [style.border-left-color]="s.subjectColor || '#f5c518'"
+                   [class.completed]="s.status === 'COMPLETED'"
+                   [class.cancelled]="s.status === 'CANCELLED'"
+                   (click)="openSession(s)">
+                <span class="wv-block-time">{{ formatTime(s.startDateTime) }}</span>
+                <strong class="wv-block-subj" [style.color]="s.subjectColor">{{ s.subjectName }}</strong>
+                <span class="wv-block-title" *ngIf="blockHeight(s) > 50">{{ s.title }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="empty-week" *ngIf="weekSessions().length === 0">
+          <p>📅 Aucune session prévue pour cette semaine.</p>
+          <button class="btn-new" (click)="addNew()">Planifier une session</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

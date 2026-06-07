@@ -1,0 +1,52 @@
+# =============================================================
+# StudyFlow - Profil DEV (Supabase + MongoDB Atlas)
+# Toutes les valeurs sensibles passent par les variables
+# d'environnement definies dans .env (cf. .env.example).
+# =============================================================
+spring:
+
+  # ---- PostgreSQL (Supabase) ----
+  datasource:
+    url: ${SUPABASE_DB_URL:}
+    username: ${SUPABASE_DB_USERNAME:}
+    password: ${SUPABASE_DB_PASSWORD:}
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 5
+      minimum-idle: 1
+      connection-timeout: 30000
+      idle-timeout: 600000
+
+  jpa:
+    hibernate:
+      ddl-auto: none                  # Schema Supabase existant, on ne valide pas
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        jdbc:
+          time_zone: UTC
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+  # ---- MongoDB Atlas ----
+  data:
+    mongodb:
+      uri: ${MONGO_URI:mongodb://localhost:27017/studyflow}
+      database: ${MONGO_DATABASE:studyflow}
+      auto-index-creation: false
+
+  # SQL d'initialisation (desactive en dev car tables deja creees via Supabase)
+  sql:
+    init:
+      mode: never
+
+  # Devtools (rechargement a chaud sur sauvegarde)
+  devtools:
+    restart:
+      enabled: true
+
+logging:
+  level:
+    org.hibernate.SQL: DEBUG
+    org.hibernate.orm.jdbc.bind: TRACE
+    org.springframework.data.mongodb.core.MongoTemplate: DEBUG

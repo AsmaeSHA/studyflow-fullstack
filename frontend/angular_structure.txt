@@ -1,0 +1,215 @@
+Structure du dossier
+Le numÇro de sÇrie du volume est 6E1D-E11B
+C:\USERS\TANKPAD\ONEDRIVE - UNIVERSITê SULTAN MOULAY SLIMANE\GI S4\AI\PROJET_JS\SRC
+|   index.html
+|   main.ts
+|   styles.scss
+|   
++---app
+|   |   app.component.ts
+|   |   app.config.ts
+|   |   app.routes.ts
+|   |   app.routes.ts.bak
+|   |   
+|   +---core
+|   |   +---data
+|   |   +---guards
+|   |   |       admin.guard.ts
+|   |   |       auth.guard.ts
+|   |   |       
+|   |   +---interceptors
+|   |   |       auth.interceptor.ts
+|   |   |       
+|   |   +---models
+|   |   |       chat.model.ts
+|   |   |       collaboration.model.ts
+|   |   |       group.model.ts
+|   |   |       invitation.model.ts
+|   |   |       member-session.model.ts
+|   |   |       models.ts
+|   |   |       notification.model.ts
+|   |   |       session.model.ts
+|   |   |       stats.model.ts
+|   |   |       subject.model.ts
+|   |   |       user.model.ts
+|   |   |       
+|   |   +---services
+|   |   |       admin-user.service.ts
+|   |   |       analytics.service.ts
+|   |   |       auth.service.ts
+|   |   |       availability.service.ts
+|   |   |       dashboard.service.ts
+|   |   |       group.service.ts
+|   |   |       mock-data.service.ts
+|   |   |       notification.service.ts
+|   |   |       planning-state.service.ts
+|   |   |       session.service.ts
+|   |   |       subject.service.ts
+|   |   |       
+|   |   \---types
+|   +---features
+|   |   +---admin
+|   |   |   |   admin.component.ts
+|   |   |   |   
+|   |   |   +---admin-profile
+|   |   |   |       admin-profile.component.ts
+|   |   |   |       
+|   |   |   +---admin-stats
+|   |   |   |       admin-stats.component.ts
+|   |   |   |       
+|   |   |   +---admin-users
+|   |   |   |       admin-users.component.ts
+|   |   |   |       service.ts
+|   |   |   |       
+|   |   |   \---components
+|   |   |           admin-sidebar.component.ts
+|   |   |           
+|   |   +---analytics
+|   |   |       analytics.component.html
+|   |   |       analytics.component.scss
+|   |   |       analytics.component.ts
+|   |   |       
+|   |   +---auth
+|   |   |   |   auth.routes.ts
+|   |   |   |   
+|   |   |   +---login
+|   |   |   |       login.component.html
+|   |   |   |       login.component.scss
+|   |   |   |       login.component.ts
+|   |   |   |       
+|   |   |   \---register
+|   |   |           register.component.html
+|   |   |           register.component.scss
+|   |   |           register.component.ts
+|   |   |           
+|   |   +---availabilities
+|   |   |       availabilities.component.ts
+|   |   |       
+|   |   +---calendar
+|   |   |       calendar.component.html
+|   |   |       calendar.component.scss
+|   |   |       calendar.component.ts
+|   |   |       
+|   |   +---chat
+|   |   |       chat.component.ts
+|   |   |       
+|   |   +---collaborative-session
+|   |   |       collaborative-session.component.ts
+|   |   |       
+|   |   +---dashboard
+|   |   |       dashboard.component.html
+|   |   |       dashboard.component.scss
+|   |   |       dashboard.component.ts
+|   |   |       dashboard.mock-data.ts
+|   |   |       
+|   |   +---goals
+|   |   |       goals.component.ts
+|   |   |       
+|   |   +---groups
+|   |   |       groups.component.ts
+|   |   |       
+|   |   +---notifications
+|   |   |       notifications.component.html
+|   |   |       notifications.component.scss
+|   |   |       notifications.component.ts
+|   |   |       
+|   |   +---planning
+|   |   |       planning.component.html
+|   |   |       planning.component.scss
+|   |   |       planning.component.ts
+|   |   |       
+|   |   +---profile
+|   |   |       profile.component.ts
+|   |   |       
+|   |   +---sessions
+|   |   |       sessions.component.html
+|   |   |       sessions.component.scss
+|   |   |       sessions.component.ts
+|   |   |       
+|   |   \---subjects
+|   |           subjects.component.ts
+|   |           
+|   \---shared
+|       |   shared.module.ts
+|       |   
+|       +---components
+|       |   |   member-sessions.component.ts
+|       |   |   
+|       |   +---availability-form
+|       |   |       availability-form.component.ts
+|       |   |       
+|       |   +---calendar-card
+|       |   |       calendar-card.component.ts
+|       |   |       
+|       |   +---chart-card
+|       |   |       chart-card.component.ts
+|       |   |       
+|       |   +---chat-box
+|       |   |       chat-box.component.ts
+|       |   |       
+|       |   +---empty-state
+|       |   |       empty-state.component.ts
+|       |   |       
+|       |   +---generated-schedule
+|       |   |       generated-schedule.component.ts
+|       |   |       
+|       |   +---group-card
+|       |   |       group-card.component.ts
+|       |   |       
+|       |   +---habit-item
+|       |   |       habit-item.component.ts
+|       |   |       
+|       |   +---member-sessions-panel
+|       |   |       member-sessions-panel.component.ts
+|       |   |       
+|       |   +---notification-item
+|       |   |       notification-item.component.ts
+|       |   |       
+|       |   +---planned-vs-actual-chart
+|       |   |       planned-vs-actual-chart.component.ts
+|       |   |       
+|       |   +---profile-card
+|       |   |       profile-card.component.ts
+|       |   |       
+|       |   +---progress-chart
+|       |   |       progress-chart.component.ts
+|       |   |       
+|       |   +---progress-ring
+|       |   |       progress-ring.component.ts
+|       |   |       
+|       |   +---sidebar
+|       |   |       sidebar.component.html
+|       |   |       sidebar.component.scss
+|       |   |       sidebar.component.ts
+|       |   |       
+|       |   +---stat-card
+|       |   |       stat-card.component.ts
+|       |   |       
+|       |   +---subject-form
+|       |   |       subject-form.component.ts
+|       |   |       
+|       |   +---subject-progress-table
+|       |   |       subject-progress-table.component.ts
+|       |   |       
+|       |   +---topbar
+|       |   |       topbar.component.html
+|       |   |       topbar.component.scss
+|       |   |       topbar.component.ts
+|       |   |       
+|       |   \---weekly-productivity-chart
+|       |           weekly-productivity-chart.component.ts
+|       |           
+|       \---pipes
+|               duration.pipe.ts
+|               
++---environements
+|       environment.development.ts
+|       environment.prod.ts
+|       environment.ts
+|       
+\---styles
+        styles.scss
+        _mixins.scss
+        _typography.scss
+        _variables.scss
+        
